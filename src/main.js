@@ -176,6 +176,9 @@ class PageManager {
       case 'states':
         this.initStatesPage();
         break;
+      case 'quiz':
+        this.initQuizPage();
+        break;
     }
   }
 
@@ -246,44 +249,38 @@ class PageManager {
 
   // הצגת טיפים לדף
   showPageTip(pageId) {
-    const tip = EducationalHelpers.generateChallenge(pageId);
-    const explanation = EducationalHelpers.createExplanationText(pageId, 1);
+    const tip = document.getElementById(`${pageId}-tip`);
+    if (tip) {
+      tip.style.display = 'block';
+      tip.classList.add('show');
+    }
+  }
+
+  // סגירת טיפ לדף
+  closePageTip(pageId) {
+    const tip = document.getElementById(`${pageId}-tip`);
+    if (tip) {
+      tip.classList.remove('show');
+      tip.style.display = 'none';
+    }
+  }
+
+  // עדכון כפתור פעיל
+  updateActiveButton(activePageId) {
+    // הסרת active מכל הכפתורים
+    document.querySelectorAll('.nav-btn, .stats-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
     
-    // יצירת בועת מידע
-    const tipElement = document.createElement('div');
-    tipElement.className = 'page-tip';
-    tipElement.innerHTML = `
-      <div class="tip-content">
-        <h4>💡 טיפ חכם:</h4>
-        <p>${explanation}</p>
-        <p><strong>אתגר:</strong> ${tip}</p>
-        <button onclick="this.parentElement.parentElement.remove()">הבנתי! ✨</button>
-      </div>
-    `;
-    
-    tipElement.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      max-width: 350px;
-      z-index: 1000;
-      animation: bounceIn 0.6s ease;
-      border: 2px solid #667eea;
-    `;
-    
-    document.body.appendChild(tipElement);
-    
-    // הסרה אוטומטית אחרי 10 שניות
-    setTimeout(() => {
-      if (tipElement.parentElement) {
-        tipElement.style.animation = 'fadeOut 0.5s ease';
-        setTimeout(() => tipElement.remove(), 500);
+    // הוספת active לכפתור הפעיל
+    if (activePageId === 'stats') {
+      document.getElementById('show-stats').classList.add('active');
+    } else {
+      const activeBtn = document.querySelector(`[data-page="${activePageId}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
       }
-    }, 10000);
+    }
   }
 
   // דף ההקדמה - תפוח נופל
@@ -626,6 +623,11 @@ class PageManager {
     initSpheres();
     animate();
   }
+
+  initQuizPage() {
+    // איתחול דף החידות
+    initQuiz();
+  }
 }
 
 // איקון SVG לכדור
@@ -766,3 +768,312 @@ document.addEventListener('click', function(e) {
     e.target.classList.add('hidden');
   }
 });
+
+// עדכון ההאזנה לכפתורים
+document.addEventListener('DOMContentLoaded', function() {
+  // הוספת האזנה לכפתורי הניווט
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const pageId = this.getAttribute('data-page');
+      updateActiveButton(pageId);
+      
+      // הצגת הטיפ לדף החדש אחרי שנייה
+      setTimeout(() => {
+        showPageTip(pageId);
+      }, 1000);
+    });
+  });
+  
+  // הוספת האזנה לכפתור הסטטיסטיקות
+  const statsBtn = document.getElementById('show-stats');
+  if (statsBtn) {
+    statsBtn.addEventListener('click', function() {
+      updateActiveButton('stats');
+      showStatsModal();
+    });
+  }
+});
+
+// מערכת חידות
+const quizQuestions = [
+  {
+    section: "חלק א': עולם של גולות",
+    question: "לפי הסיפור, אם נסתכל במיקרוסקופ מיוחד על כל דבר בעולם, מה נגלה?",
+    answers: [
+      "שהכל עשוי מלגו צבעוני",
+      "שהכל עשוי מגולות קטנטנות בכל מיני גדלים",
+      "שהכל עשוי ממים",
+      "שהכל עשוי מאוויר"
+    ],
+    correct: 1
+  },
+  {
+    section: "חלק א': עולם של גולות",
+    question: "איך קראנו בסיפור לכוח הנעלם שמושך את כל הגולות זו לזו?",
+    answers: ["כוח הכבידה", "כוח המגנט", "דבקסם", "כוח-על"],
+    correct: 2
+  },
+  {
+    section: "חלק א': עולם של גולות",
+    question: "למה קשה לקרוע דף נייר או לשבור מקל?",
+    answers: [
+      "כי הנייר והמקל לא רוצים שניגע בהם",
+      "בגלל כוח הכבידה שמושך אותם לרצפה",
+      "כי יש רוח חזקה שמחזיקה אותם",
+      "כי כוח הדבקסם מחזיק את הגולות שלהם חזק ביחד"
+    ],
+    correct: 3
+  },
+  {
+    section: "חלק ב': ריקוד הגולות",
+    question: "איך ייראו הגולות בחפץ קשה כמו אבן או קרח?",
+    answers: [
+      "הן עפות במהירות ומתנגשות זו בזו",
+      "הן מתגלגלות אחת על השנייה כמו במיקסר",
+      "הן צפופות מאוד ורק רועדות קצת במקום",
+      "הן ישנות ולא זזות בכלל"
+    ],
+    correct: 2
+  },
+  {
+    section: "חלק ב': ריקוד הגולות",
+    question: "ואיך ייראו הגולות בנוזל כמו מים או שמן?",
+    answers: [
+      "הן עפות בחופשיות באוויר",
+      "הן צמודות אבל מתגלגלות זו על זו",
+      "הן מסודרות בשורה ישרה ולא זזות",
+      "הן נעלמות לגמרי"
+    ],
+    correct: 1
+  },
+  {
+    section: "חלק ב': ריקוד הגולות",
+    question: "באיזה מצב הגולות רחוקות זו מזו, עפות במהירות גבוהה ומתנגשות?",
+    answers: [
+      "במוצק (כמו עץ)",
+      "בנוזל (כמו מיץ)", 
+      "בגז (כמו האוויר שאנחנו נושמים)",
+      "בשוקולד"
+    ],
+    correct: 2
+  },
+  {
+    section: "חלק ג': חום ותנועה",
+    question: "מה זה בעצם חום או טמפרטורה לפי הסיפור?",
+    answers: [
+      "צבע מיוחד שיש לגולות",
+      "מדד למהירות התנועה של הגולות",
+      "כמות הדבקסם שיש בין הגולות",
+      "הגודל של הגולות"
+    ],
+    correct: 1
+  },
+  {
+    section: "חלק ג': חום ותנועה",
+    question: "כשאנחנו מחממים מים בסיר, מה בעצם קורה לגולות המים?",
+    answers: [
+      "הן הופכות להיות קטנות יותר",
+      "הן מתחילות לנוע לאט יותר ויותר",
+      "הן מקבלות יותר ויותר מהירות ומתחילות להשתולל",
+      "הן נדבקות חזק יותר זו לזו"
+    ],
+    correct: 2
+  },
+  {
+    section: "חלק ג': חום ותנועה",
+    question: "מה קורה לגולות של הקרח כשהוא הופך למים ואז לאדים?",
+    answers: [
+      "הגולות קודם רועדות במקום, אחר כך מתגלגלות ולבסוף מתנתקות ועפות",
+      "הגולות קודם עפות, אחר כך מתגלגלות ולבסוף קופאות במקום",
+      "הגולות לא משנות את התנועה שלהן, רק הצבע משתנה",
+      "מספר הגולות גדל ככל שמחממים יותר"
+    ],
+    correct: 0
+  },
+  {
+    section: "חלק ג': חום ותנועה",
+    question: "לפי הסיפור, למה הגולות באוויר לא נדבקות זו לזו למרות כוח הדבקסם?",
+    answers: [
+      "כי אין דבקסם באוויר",
+      "כי הן נעות כל כך מהר, שהמהירות מתגברת על כוח המשיכה ביניהן",
+      "כי הן חלקלקות מדי",
+      "כי מישהו שם ביניהן שמן"
+    ],
+    correct: 1
+  },
+  {
+    section: "חלק ד': הכירו את הצורונים",
+    question: "מהם הצורונים שהסיפור מדבר עליהם?",
+    answers: [
+      "שם אחר לגולות בודדות",
+      "מפלצות קטנות שחיות בין הגולות",
+      "צורות מורכבות שנוצרו מכמה גולות שנדבקו חזק",
+      "הכלים שבעזרתם אנחנו מסתכלים על הגולות"
+    ],
+    correct: 2
+  },
+  {
+    section: "חלק ד': הכירו את הצורונים",
+    question: "לפי הסיפור, למה צריך לחמם שמן לטמפרטורה גבוהה יותר ממים כדי שהוא ירתח?",
+    answers: [
+      "כי שמן הוא יותר צהוב ממים",
+      "כי הצורונים של שמן גדולים יותר ונדבקים חזק יותר",
+      "כי בשמן אין בכלל דבקסם",
+      "כי הגולות של השמן פשוט לא אוהבות לזוז מהר"
+    ],
+    correct: 1
+  },
+  {
+    section: "חלק ד': הכירו את הצורונים",
+    question: "כשממיסים סוכר במים, מה קורה לצורונים של הסוכר?",
+    answers: [
+      "הם נשרפים ונעלמים",
+      "הם מתפרקים ומתפזרים בין הצורונים של המים",
+      "הם הופכים לצורונים של מים",
+      "הם שוקעים לתחתית ונשארים שם ביחד"
+    ],
+    correct: 1
+  }
+];
+
+let currentQuestionIndex = 0;
+let correctAnswers = 0;
+
+function initQuiz() {
+  currentQuestionIndex = 0;
+  correctAnswers = 0;
+  showQuestion();
+}
+
+function showQuestion() {
+  const question = quizQuestions[currentQuestionIndex];
+  
+  document.getElementById('quiz-section').textContent = question.section;
+  document.getElementById('question-text').textContent = question.question;
+  document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+  document.getElementById('total-questions').textContent = quizQuestions.length;
+  
+  // עדכון התקדמות
+  const progress = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+  document.getElementById('quiz-progress').style.width = progress + '%';
+  
+  // יצירת תשובות
+  const answersContainer = document.getElementById('answers-container');
+  answersContainer.innerHTML = '';
+  
+  question.answers.forEach((answer, index) => {
+    const answerDiv = document.createElement('div');
+    answerDiv.className = 'answer-option';
+    answerDiv.textContent = `${index + 1}. ${answer}`;
+    answerDiv.onclick = () => selectAnswer(index);
+    answersContainer.appendChild(answerDiv);
+  });
+  
+  // הסתרת פידבק וכפתורים
+  document.getElementById('quiz-feedback').style.display = 'none';
+  document.getElementById('next-question').classList.add('hidden');
+  document.getElementById('finish-quiz').classList.add('hidden');
+}
+
+function selectAnswer(selectedIndex) {
+  const question = quizQuestions[currentQuestionIndex];
+  const answers = document.querySelectorAll('.answer-option');
+  const feedback = document.getElementById('quiz-feedback');
+  
+  // הסרת בחירה קודמת
+  answers.forEach(answer => {
+    answer.classList.remove('selected', 'correct', 'incorrect');
+  });
+  
+  // סימון התשובה שנבחרה
+  answers[selectedIndex].classList.add('selected');
+  
+  if (selectedIndex === question.correct) {
+    // תשובה נכונה
+    answers[selectedIndex].classList.add('correct');
+    feedback.className = 'quiz-feedback correct';
+    feedback.innerHTML = getCorrectFeedback();
+    correctAnswers++;
+    
+    // הצגת כפתור הבא
+    setTimeout(() => {
+      if (currentQuestionIndex < quizQuestions.length - 1) {
+        document.getElementById('next-question').classList.remove('hidden');
+      } else {
+        document.getElementById('finish-quiz').classList.remove('hidden');
+      }
+    }, 1500);
+  } else {
+    // תשובה שגויה
+    answers[selectedIndex].classList.add('incorrect');
+    feedback.className = 'quiz-feedback incorrect';
+    feedback.innerHTML = getIncorrectFeedback();
+  }
+}
+
+function getCorrectFeedback() {
+  const messages = [
+    "מעולה! אתם חוקרים מצוינים! 🌟",
+    "פנטסטי! הבנתם בדיוק נכון! 🎉", 
+    "וואו! אתם באמת מבינים את עולם הגולות! ⭐",
+    "מדהים! התשובה מושלמת! 🏆",
+    "כל הכבוד! אתם אמיתיים מדענים! 🔬"
+  ];
+  return messages[Math.floor(Math.random() * messages.length)];
+}
+
+function getIncorrectFeedback() {
+  const messages = [
+    "לא נכון, אבל זה בסדר! בואו ננסה שוב 😊",
+    "קרוב, אבל לא מדויק. נסו תשובה אחרת! 🤔",
+    "לא בדיוק... חשבו על מה שראיתם בדפים הקודמים 💭",
+    "טעות קטנה! נסו שוב, אני בטוח שתצליחו! 💪"
+  ];
+  return messages[Math.floor(Math.random() * messages.length)];
+}
+
+// האזנה לכפתורים
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('next-question')?.addEventListener('click', function() {
+    currentQuestionIndex++;
+    showQuestion();
+  });
+  
+  document.getElementById('finish-quiz')?.addEventListener('click', function() {
+    showResults();
+  });
+});
+
+function showResults() {
+  const resultsDiv = document.getElementById('quiz-results');
+  const percentage = Math.round((correctAnswers / quizQuestions.length) * 100);
+  
+  let message = '';
+  if (percentage >= 90) {
+    message = 'מדען גדול! 👨‍🔬 אתם מבינים הכל על הדבקסם!';
+  } else if (percentage >= 70) {
+    message = 'חוקר מומחה! 🌟 ביצועים מעולים!';
+  } else if (percentage >= 50) {
+    message = 'חוקר מתקדם! 🔍 אתם בדרך הנכונה!';
+  } else {
+    message = 'חוקר מתחיל! 🌱 כדאי לחזור על החומר!';
+  }
+  
+  resultsDiv.innerHTML = `
+    <h3>סיימתם את החידות!</h3>
+    <p>ענית נכון על ${correctAnswers} מתוך ${quizQuestions.length} שאלות</p>
+    <p>ציון: ${percentage}%</p>
+    <p>${message}</p>
+    <button class="quiz-btn" onclick="initQuiz()">התחל מחדש</button>
+  `;
+  
+  document.getElementById('quiz-card').style.display = 'none';
+  resultsDiv.style.display = 'block';
+}
+
+// יתוף PageManager עם החידות
+class QuizManager {
+  constructor() {
+    this.initQuiz = initQuiz;
+  }
+}

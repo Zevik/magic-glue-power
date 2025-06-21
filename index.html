@@ -20,12 +20,23 @@
         <button class="nav-btn" data-page="spheres">⚪ עולם הגולות</button>
         <button class="nav-btn" data-page="temperature">🌡️ ריקוד הגולות</button>
         <button class="nav-btn" data-page="states">💧 קסמי החומר</button>
+        <button class="nav-btn" data-page="quiz">🎯 חידות הדבקסם</button>
         <button class="stats-btn" id="show-stats">📊 הישגים</button>
       </nav>
 
       <main class="content">
         <!-- דף ההקדמה -->
         <section id="intro-page" class="page active">
+          <div class="page-tip-container" id="intro-tip">
+            <div class="page-tip-header">
+              <h4>💡 טיפ חכם</h4>
+              <button class="tip-close-btn" onclick="closePageTip('intro')">&times;</button>
+            </div>
+            <div class="page-tip-content">
+              <p>הנה טיפ מעניין: כוח הכבידה והדבקסם הם שני כוחות שונים! הכבידה מושכת דברים כלפי מטה, והדבקסם מחזיק את החלקיקים יחד!</p>
+            </div>
+          </div>
+          
           <div class="story-container">
             <h2>🍎 למה התפוח לא נופל רחוק מהעץ?</h2>
             <p class="story-text">
@@ -41,6 +52,16 @@
 
         <!-- דף המיקרוסקופ -->
         <section id="microscope-page" class="page">
+          <div class="page-tip-container" id="microscope-tip">
+            <div class="page-tip-header">
+              <h4>🔬 טיפ למיקרוסקופ</h4>
+              <button class="tip-close-btn" onclick="closePageTip('microscope')">&times;</button>
+            </div>
+            <div class="page-tip-content">
+              <p>נסו לשנות את רמת ההגדלה ותראו איך העולם נראה שונה בכל רמה! ככל שמגדילים יותר, כך רואים יותר פרטים קטנים.</p>
+            </div>
+          </div>
+          
           <div class="microscope-container">
             <h2>🔬 המיקרוסקופ המטורף</h2>
             <p>בואו נסתכל על העולם דרך מיקרוסקופ שמגדיל פי מאה מיליון!</p>
@@ -63,6 +84,16 @@
 
         <!-- דף עולם הגולות -->
         <section id="spheres-page" class="page">
+          <div class="page-tip-container" id="spheres-tip">
+            <div class="page-tip-header">
+              <h4>⚪ טיפ לגולות</h4>
+              <button class="tip-close-btn" onclick="closePageTip('spheres')">&times;</button>
+            </div>
+            <div class="page-tip-content">
+              <p>נסו להוסיף הרבה גולות ואז לכבות את הדבקסם - תראו איך הן מתפזרות! זה מה שקורה כשמחממים גז.</p>
+            </div>
+          </div>
+          
           <div class="spheres-container">
             <h2>⚪ עולם הגולות הקסומות</h2>
             <p>כל העולם עשוי מגולות קטנות שנמשכות זו לזו כמו מגנטים!</p>
@@ -85,6 +116,16 @@
 
         <!-- דף הטמפרטורה -->
         <section id="temperature-page" class="page">
+          <div class="page-tip-container" id="temperature-tip">
+            <div class="page-tip-header">
+              <h4>🌡️ טיפ לטמפרטורה</h4>
+              <button class="tip-close-btn" onclick="closePageTip('temperature')">&times;</button>
+            </div>
+            <div class="page-tip-content">
+              <p>עקבו אחר המדחום! ככל שהטמפרטורה עולה, כך הגולות נעות מהר יותר. זה הסוד של החום!</p>
+            </div>
+          </div>
+          
           <div class="temperature-container">
             <h2>🌡️ ריקוד הגולות - מה זה חום?</h2>
             <p>חום זה בעצם תנועה! ככל שהגולות נעות מהר יותר, כך הטמפרטורה גבוהה יותר.</p>
@@ -114,6 +155,16 @@
 
         <!-- דף מצבי החומר -->
         <section id="states-page" class="page">
+          <div class="page-tip-container" id="states-tip">
+            <div class="page-tip-header">
+              <h4>💧 טיפ למצבי חומר</h4>
+              <button class="tip-close-btn" onclick="closePageTip('states')">&times;</button>
+            </div>
+            <div class="page-tip-content">
+              <p>שימו לב איך אותן גולות יכולות להראות שונה לגמרי! קרח קשה, מים נוזליים וגז עף באוויר - אותן גולות, מהירויות שונות!</p>
+            </div>
+          </div>
+          
           <div class="states-container">
             <h2>💧 קסמי החומר - קרח, מים וגז</h2>
             <p>רואים איך אותן גולות יכולות להיות קרח, מים או גז?</p>
@@ -130,6 +181,58 @@
             
             <div class="state-explanation">
               <p id="state-info">לחצו על הכפתורים למעלה לראות איך משתנים מצבי החומר!</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- דף החידות -->
+        <section id="quiz-page" class="page">
+          <div class="page-tip-container" id="quiz-tip">
+            <div class="page-tip-header">
+              <h4>🎯 טיפ לחידות</h4>
+              <button class="tip-close-btn" onclick="closePageTip('quiz')">&times;</button>
+            </div>
+            <div class="page-tip-content">
+              <p>אל תדאגו אם אתם טועים! כל טעות מלמדת אותנו משהו חדש. קחו את הזמן שלכם וחשבו על מה שראיתם בדפים הקודמים.</p>
+            </div>
+          </div>
+          
+          <div class="quiz-container">
+            <h2>🎯 חידות הדבקסם</h2>
+            <p class="quiz-intro">בואו נבדוק כמה אתם זוכרים מהמסע שלנו עם הגולות הקסומות!</p>
+            
+            <div class="quiz-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="quiz-progress"></div>
+              </div>
+              <span class="progress-text">שאלה <span id="current-question">1</span> מתוך <span id="total-questions">13</span></span>
+            </div>
+
+            <div class="quiz-card" id="quiz-card">
+              <div class="question-header">
+                <h3 id="quiz-section">חלק א': עולם של גולות</h3>
+              </div>
+              
+              <div class="question-content">
+                <p id="question-text">טוען שאלה...</p>
+                
+                <div class="answers-container" id="answers-container">
+                  <!-- התשובות יתווספו דינמית -->
+                </div>
+              </div>
+
+              <div class="quiz-feedback" id="quiz-feedback">
+                <!-- הודעות עידוד יופיעו כאן -->
+              </div>
+
+              <div class="quiz-controls">
+                <button id="next-question" class="quiz-btn next-btn hidden">השאלה הבאה</button>
+                <button id="finish-quiz" class="quiz-btn finish-btn hidden">סיום החידות</button>
+              </div>
+            </div>
+
+            <div class="quiz-results" id="quiz-results">
+              <!-- תוצאות סופיות -->
             </div>
           </div>
         </section>
