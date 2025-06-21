@@ -122,7 +122,7 @@
               <button class="tip-close-btn" onclick="closePageTip('temperature')">&times;</button>
             </div>
             <div class="page-tip-content">
-              <p>עקבו אחר המדחום! ככל שהטמפרטורה עולה, כך הגולות נעות מהר יותר. זה הסוד של החום!</p>
+              <p>נסו לשנות את הטמפרטורה! מתחת ל-0 זה קרח קפוא, 0-100 זה נוזל, ומעל 100 זה גז רותח! עקבו איך הגולות משנות התנהגות!</p>
             </div>
           </div>
           
@@ -132,7 +132,7 @@
             
             <div class="temperature-controls">
               <label>טמפרטורה:</label>
-              <input type="range" id="temperature-slider" min="0" max="100" value="20" step="5">
+              <input type="range" id="temperature-slider" min="-100" max="200" value="20" step="10">
               <span id="temperature-display">20°C</span>
             </div>
             
@@ -144,9 +144,10 @@
               <div class="thermometer-container">
                 <div id="mercury" class="mercury"></div>
                 <div class="scale">
+                  <span>200°</span>
                   <span>100°</span>
-                  <span>50°</span>
                   <span>0°</span>
+                  <span>-100°</span>
                 </div>
               </div>
             </div>

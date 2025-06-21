@@ -494,49 +494,168 @@ class PageManager {
     let temperature = 20;
     let animationId;
 
-    // יצירת גולות
-    for (let i = 0; i < 12; i++) {
-      const x = Math.random() * (canvas.width - 40) + 20;
-      const y = Math.random() * (canvas.height - 40) + 20;
-      spheres.push(new Sphere(x, y, 6, '#e53e3e', 0.5));
-    }
+    // יצירת גולות לפי מצב
+    const initSpheres = () => {
+      spheres = [];
+      if (temperature < 0) {
+        // מוצק - ריבוע מושלם
+        const rows = 4;
+        const cols = 4;
+        const spacing = 35;
+        const startX = (canvas.width - (cols - 1) * spacing) / 2;
+        const startY = (canvas.height - (rows - 1) * spacing) / 2;
+        
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const x = startX + col * spacing;
+            const y = startY + row * spacing;
+            spheres.push(new Sphere(x, y, 8, '#4299e1', 0.1));
+          }
+        }
+      } else if (temperature >= 0 && temperature <= 100) {
+        // נוזל - כדורים צמודים שמתגלגלים
+        for (let i = 0; i < 16; i++) {
+          const x = Math.random() * (canvas.width - 60) + 30;
+          const y = Math.random() * (canvas.height - 60) + 30;
+          spheres.push(new Sphere(x, y, 7, '#38a169', 1));
+        }
+      } else {
+        // גז - עפים לכל הכיוונים
+        for (let i = 0; i < 12; i++) {
+          const x = Math.random() * (canvas.width - 40) + 20;
+          const y = Math.random() * (canvas.height - 40) + 20;
+          spheres.push(new Sphere(x, y, 5, '#e53e3e', Math.max(3, temperature / 50)));
+        }
+      }
+    };
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      const tempFactor = temperature / 50;
-      spheres.forEach(sphere => {
-        sphere.update(canvas.width, canvas.height, null, tempFactor);
-        sphere.draw(ctx);
-      });
+      if (temperature < 0) {
+        // מוצק - רק רעידות קטנות
+        spheres.forEach((sphere, index) => {
+          const originalX = sphere.originalX || sphere.x;
+          const originalY = sphere.originalY || sphere.y;
+          sphere.originalX = originalX;
+          sphere.originalY = originalY;
+          
+          sphere.x = originalX + (Math.random() - 0.5) * 2;
+          sphere.y = originalY + (Math.random() - 0.5) * 2;
+          sphere.draw(ctx);
+        });
+      } else if (temperature >= 0 && temperature <= 100) {
+        // נוזל - תנועה צמודה ומתגלגלת
+        const liquidSpeed = temperature / 100;
+        spheres.forEach((sphere, i) => {
+          // כוח משיכה לכדורים קרובים
+          let forceX = 0, forceY = 0;
+          spheres.forEach((other, j) => {
+            if (i !== j) {
+              const dx = other.x - sphere.x;
+              const dy = other.y - sphere.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance < 25 && distance > 0) {
+                forceX += dx / distance * 0.1;
+                forceY += dy / distance * 0.1;
+              }
+            }
+          });
+          
+          sphere.vx = (sphere.vx || 0) + forceX + (Math.random() - 0.5) * liquidSpeed;
+          sphere.vy = (sphere.vy || 0) + forceY + (Math.random() - 0.5) * liquidSpeed;
+          
+          // הגבלת מהירות
+          const maxSpeed = liquidSpeed * 2;
+          const speed = Math.sqrt(sphere.vx * sphere.vx + sphere.vy * sphere.vy);
+          if (speed > maxSpeed) {
+            sphere.vx = (sphere.vx / speed) * maxSpeed;
+            sphere.vy = (sphere.vy / speed) * maxSpeed;
+          }
+          
+          sphere.x += sphere.vx;
+          sphere.y += sphere.vy;
+          
+          // גבולות
+          if (sphere.x < sphere.radius || sphere.x > canvas.width - sphere.radius) {
+            sphere.vx *= -0.8;
+            sphere.x = Math.max(sphere.radius, Math.min(canvas.width - sphere.radius, sphere.x));
+          }
+          if (sphere.y < sphere.radius || sphere.y > canvas.height - sphere.radius) {
+            sphere.vy *= -0.8;
+            sphere.y = Math.max(sphere.radius, Math.min(canvas.height - sphere.radius, sphere.y));
+          }
+          
+          sphere.draw(ctx);
+        });
+      } else {
+        // גז - תנועה חופשית ומהירה
+        const gasSpeed = Math.min(10, temperature / 30);
+        spheres.forEach(sphere => {
+          sphere.vx = (sphere.vx || 0) + (Math.random() - 0.5) * gasSpeed;
+          sphere.vy = (sphere.vy || 0) + (Math.random() - 0.5) * gasSpeed;
+          
+          sphere.x += sphere.vx;
+          sphere.y += sphere.vy;
+          
+          // התנגשות עם קירות
+          if (sphere.x < sphere.radius || sphere.x > canvas.width - sphere.radius) {
+            sphere.vx *= -0.9;
+            sphere.x = Math.max(sphere.radius, Math.min(canvas.width - sphere.radius, sphere.x));
+          }
+          if (sphere.y < sphere.radius || sphere.y > canvas.height - sphere.radius) {
+            sphere.vy *= -0.9;
+            sphere.y = Math.max(sphere.radius, Math.min(canvas.height - sphere.radius, sphere.y));
+          }
+          
+          sphere.draw(ctx);
+        });
+      }
       
-      // ציור מדחום דיגיטלי
+      // הצגת מידע על המצב
       ctx.fillStyle = '#4a5568';
       ctx.font = '16px Heebo';
       ctx.textAlign = 'center';
-      ctx.fillText(`מהירות הגולות: ${temperature > 50 ? 'מהירה' : temperature > 25 ? 'בינונית' : 'איטית'}`, canvas.width/2, 30);
+      
+      let stateText = '';
+      if (temperature < 0) {
+        stateText = 'מוצק - הגולות קפואות במקום 🧊';
+      } else if (temperature <= 100) {
+        stateText = 'נוזל - הגולות מתגלגלות יחד 💧';
+      } else {
+        stateText = 'גז - הגולות עפות חופשיות ☁️';
+      }
+      
+      ctx.fillText(stateText, canvas.width/2, 30);
       
       animationId = requestAnimationFrame(animate);
     };
 
-    slider.addEventListener('input', (e) => {
-      temperature = parseInt(e.target.value);
+    // עדכון טמפרטורה
+    const updateTemperature = () => {
+      temperature = parseInt(slider.value);
       display.textContent = `${temperature}°C`;
       
-      // עדכון מדחום
-      const height = (temperature / 100) * 80 + 20;
-      mercury.style.height = `${height}%`;
+      // עדכון מדחום (סקאלה של -100 עד 200)
+      const mercuryHeight = ((temperature + 100) / 300) * 100;
+      mercury.style.height = `${Math.max(0, Math.min(100, mercuryHeight))}%`;
       
-      // שינוי צבע לפי טמפרטורה
-      if (temperature > 50) {
-        mercury.style.background = 'linear-gradient(to top, #e53e3e, #fc8181)';
-      } else if (temperature > 25) {
-        mercury.style.background = 'linear-gradient(to top, #d69e2e, #f6e05e)';
+      // שינוי צבע המדחום לפי טמפרטורה
+      if (temperature < 0) {
+        mercury.style.background = 'linear-gradient(to top, #3182ce, #63b3ed)'; // כחול
+      } else if (temperature <= 100) {
+        mercury.style.background = 'linear-gradient(to top, #38a169, #68d391)'; // ירוק
       } else {
-        mercury.style.background = 'linear-gradient(to top, #3182ce, #63b3ed)';
+        mercury.style.background = 'linear-gradient(to top, #e53e3e, #fc8181)'; // אדום
       }
-    });
+      
+      initSpheres();
+    };
 
+    slider.addEventListener('input', updateTemperature);
+    
+    initSpheres();
+    updateTemperature();
     animate();
   }
 
