@@ -514,10 +514,20 @@ class PageManager {
         }
       } else if (temperature >= 0 && temperature <= 100) {
         // נוזל - כדורים צמודים שמתגלגלים
-        for (let i = 0; i < 16; i++) {
-          const x = Math.random() * (canvas.width - 60) + 30;
-          const y = Math.random() * (canvas.height - 60) + 30;
-          spheres.push(new Sphere(x, y, 7, '#38a169', 1));
+        const rows = 4;
+        const cols = 4;
+        const spacing = 20; // ריווח קטן יותר - צמודים
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const startX = centerX - (cols - 1) * spacing / 2;
+        const startY = centerY - (rows - 1) * spacing / 2;
+        
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const x = startX + col * spacing;
+            const y = startY + row * spacing;
+            spheres.push(new Sphere(x, y, 8, '#38a169', 1));
+          }
         }
       } else {
         // גז - עפים לכל הכיוונים
@@ -545,46 +555,29 @@ class PageManager {
           sphere.draw(ctx);
         });
       } else if (temperature >= 0 && temperature <= 100) {
-        // נוזל - תנועה צמודה ומתגלגלת
-        const liquidSpeed = temperature / 100;
+        // נוזל - תנועה צמודה וסיבובית
+        const liquidSpeed = temperature / 200; // מהירות איטית יותר
+        const time = Date.now() * 0.001;
+        
         spheres.forEach((sphere, i) => {
-          // כוח משיכה לכדורים קרובים
-          let forceX = 0, forceY = 0;
-          spheres.forEach((other, j) => {
-            if (i !== j) {
-              const dx = other.x - sphere.x;
-              const dy = other.y - sphere.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              if (distance < 25 && distance > 0) {
-                forceX += dx / distance * 0.1;
-                forceY += dy / distance * 0.1;
-              }
-            }
-          });
-          
-          sphere.vx = (sphere.vx || 0) + forceX + (Math.random() - 0.5) * liquidSpeed;
-          sphere.vy = (sphere.vy || 0) + forceY + (Math.random() - 0.5) * liquidSpeed;
-          
-          // הגבלת מהירות
-          const maxSpeed = liquidSpeed * 2;
-          const speed = Math.sqrt(sphere.vx * sphere.vx + sphere.vy * sphere.vy);
-          if (speed > maxSpeed) {
-            sphere.vx = (sphere.vx / speed) * maxSpeed;
-            sphere.vy = (sphere.vy / speed) * maxSpeed;
+          // שמירת המיקום המקורי
+          if (!sphere.originalX) {
+            sphere.originalX = sphere.x;
+            sphere.originalY = sphere.y;
+            sphere.angle = i; // זווית התחלתית שונה לכל כדור
           }
           
-          sphere.x += sphere.vx;
-          sphere.y += sphere.vy;
+          // תנועה סיבובית קטנה סביב המיקום המקורי
+          const radius = 3 + liquidSpeed * 10; // רדיוס התנועה
+          sphere.angle += liquidSpeed * 2;
           
-          // גבולות
-          if (sphere.x < sphere.radius || sphere.x > canvas.width - sphere.radius) {
-            sphere.vx *= -0.8;
-            sphere.x = Math.max(sphere.radius, Math.min(canvas.width - sphere.radius, sphere.x));
-          }
-          if (sphere.y < sphere.radius || sphere.y > canvas.height - sphere.radius) {
-            sphere.vy *= -0.8;
-            sphere.y = Math.max(sphere.radius, Math.min(canvas.height - sphere.radius, sphere.y));
-          }
+          sphere.x = sphere.originalX + Math.cos(sphere.angle + time) * radius;
+          sphere.y = sphere.originalY + Math.sin(sphere.angle + time) * radius;
+          
+          // תנועה קלה של כל הקבוצה
+          const groupMovement = Math.sin(time * 0.5) * 2;
+          sphere.x += groupMovement;
+          sphere.y += Math.cos(time * 0.3) * 1;
           
           sphere.draw(ctx);
         });
@@ -696,17 +689,28 @@ class PageManager {
       const count = 16;
       const state = states[currentState];
       
-      for (let i = 0; i < count; i++) {
-        let x, y;
-        if (currentState === 'solid') {
-          // מערך מסודר לחומר מוצק
-          x = 100 + (i % 4) * 30;
-          y = 100 + Math.floor(i / 4) * 30;
-        } else {
-          x = Math.random() * (canvas.width - 40) + 20;
-          y = Math.random() * (canvas.height - 40) + 20;
+      if (currentState === 'solid' || currentState === 'liquid') {
+        // מערך מסודר למוצק ונוזל - צמודים
+        const rows = 4;
+        const cols = 4;
+        const spacing = currentState === 'solid' ? 25 : 22; // נוזל קצת יותר צמוד
+        const startX = (canvas.width - (cols - 1) * spacing) / 2;
+        const startY = (canvas.height - (rows - 1) * spacing) / 2;
+        
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const x = startX + col * spacing;
+            const y = startY + row * spacing;
+            spheres.push(new Sphere(x, y, 8, state.color, state.speed));
+          }
         }
-        spheres.push(new Sphere(x, y, 8, state.color, state.speed));
+      } else {
+        // גז - פזורים
+        for (let i = 0; i < count; i++) {
+          const x = Math.random() * (canvas.width - 40) + 20;
+          const y = Math.random() * (canvas.height - 40) + 20;
+          spheres.push(new Sphere(x, y, 8, state.color, state.speed));
+        }
       }
     };
 
@@ -714,9 +718,40 @@ class PageManager {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       const state = states[currentState];
-      spheres.forEach(sphere => {
-        sphere.isAttracted = state.attraction;
-        sphere.update(canvas.width, canvas.height, state.attraction ? spheres : null, state.speed);
+      const time = Date.now() * 0.001;
+      
+      spheres.forEach((sphere, i) => {
+        if (currentState === 'solid') {
+          // מוצק - רק רעידות קטנות
+          const originalX = sphere.originalX || sphere.x;
+          const originalY = sphere.originalY || sphere.y;
+          sphere.originalX = originalX;
+          sphere.originalY = originalY;
+          
+          sphere.x = originalX + (Math.random() - 0.5) * 1;
+          sphere.y = originalY + (Math.random() - 0.5) * 1;
+        } else if (currentState === 'liquid') {
+          // נוזל - תנועה סיבובית צמודה
+          if (!sphere.originalX) {
+            sphere.originalX = sphere.x;
+            sphere.originalY = sphere.y;
+            sphere.angle = i;
+          }
+          
+          const radius = 2;
+          sphere.angle += 0.02;
+          
+          sphere.x = sphere.originalX + Math.cos(sphere.angle + time) * radius;
+          sphere.y = sphere.originalY + Math.sin(sphere.angle + time) * radius;
+          
+          // תנועה קלה של כל הקבוצה
+          sphere.x += Math.sin(time * 0.3) * 1;
+          sphere.y += Math.cos(time * 0.2) * 0.5;
+        } else {
+          // גז - תנועה חופשית
+          sphere.update(canvas.width, canvas.height, null, state.speed);
+        }
+        
         sphere.draw(ctx);
       });
       
