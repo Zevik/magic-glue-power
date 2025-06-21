@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/sphere.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>דבקסם - מסע במיקרוסקופ הקסמים</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app">
+      <header class="main-header">
+        <h1 class="title">🔬 דבקסם - מסע במיקרוסקופ הקסמים</h1>
+        <p class="subtitle">גלו את הכוח הנעלם שמחבר את כל העולם!</p>
+      </header>
+      
+      <nav class="navigation">
+        <button class="nav-btn active" data-page="intro">🌟 הכוח הנעלם</button>
+        <button class="nav-btn" data-page="microscope">🔬 המיקרוסקופ הקסום</button>
+        <button class="nav-btn" data-page="spheres">⚪ עולם הגולות</button>
+        <button class="nav-btn" data-page="temperature">🌡️ ריקוד הגולות</button>
+        <button class="nav-btn" data-page="states">💧 קסמי החומר</button>
+        <button class="stats-btn" id="show-stats">📊 הישגים</button>
+      </nav>
+
+      <main class="content">
+        <!-- דף ההקדמה -->
+        <section id="intro-page" class="page active">
+          <div class="story-container">
+            <h2>🍎 למה התפוח לא נופל רחוק מהעץ?</h2>
+            <p class="story-text">
+              כולם יודעים על כוח הכבידה, אבל האם אתם יודעים על הכוח הנעלם האחר?
+              הכוח שגורם למקל להיות חזק, למים להיות נוזליים ולשוקולד להמס?
+            </p>
+            <div class="interactive-demo" id="falling-apple">
+              <canvas id="intro-canvas" width="300" height="200"></canvas>
+              <p class="demo-text">לחצו על התפוח לראות מה קורה!</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- דף המיקרוסקופ -->
+        <section id="microscope-page" class="page">
+          <div class="microscope-container">
+            <h2>🔬 המיקרוסקופ המטורף</h2>
+            <p>בואו נסתכל על העולם דרך מיקרוסקופ שמגדיל פי מאה מיליון!</p>
+            
+            <div class="zoom-controls">
+              <label>רמת הגדלה:</label>
+              <input type="range" id="zoom-slider" min="1" max="5" value="1" step="1">
+              <span id="zoom-level">עין רגילה</span>
+            </div>
+            
+            <div class="microscope-view">
+              <canvas id="microscope-canvas" width="500" height="400"></canvas>
+            </div>
+            
+            <div class="zoom-info">
+              <p id="zoom-description">מה אנחנו רואים ברמת הגדלה הזו?</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- דף עולם הגולות -->
+        <section id="spheres-page" class="page">
+          <div class="spheres-container">
+            <h2>⚪ עולם הגולות הקסומות</h2>
+            <p>כל העולם עשוי מגולות קטנות שנמשכות זו לזו כמו מגנטים!</p>
+            
+            <div class="demo-controls">
+              <button id="add-spheres">הוסף גולות</button>
+              <button id="remove-spheres">הסר גולות</button>
+              <button id="toggle-attraction">דבקסם ON/OFF</button>
+            </div>
+            
+            <div class="spheres-playground">
+              <canvas id="spheres-canvas" width="600" height="400"></canvas>
+            </div>
+            
+            <div class="explanation">
+              <p>השתמשו בכפתורים למעלה כדי לראות איך הגולות מתנהגות!</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- דף הטמפרטורה -->
+        <section id="temperature-page" class="page">
+          <div class="temperature-container">
+            <h2>🌡️ ריקוד הגולות - מה זה חום?</h2>
+            <p>חום זה בעצם תנועה! ככל שהגולות נעות מהר יותר, כך הטמפרטורה גבוהה יותר.</p>
+            
+            <div class="temperature-controls">
+              <label>טמפרטורה:</label>
+              <input type="range" id="temperature-slider" min="0" max="100" value="20" step="5">
+              <span id="temperature-display">20°C</span>
+            </div>
+            
+            <div class="temperature-demo">
+              <canvas id="temperature-canvas" width="500" height="300"></canvas>
+            </div>
+            
+            <div class="thermometer">
+              <div class="thermometer-container">
+                <div id="mercury" class="mercury"></div>
+                <div class="scale">
+                  <span>100°</span>
+                  <span>50°</span>
+                  <span>0°</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- דף מצבי החומר -->
+        <section id="states-page" class="page">
+          <div class="states-container">
+            <h2>💧 קסמי החומר - קרח, מים וגז</h2>
+            <p>רואים איך אותן גולות יכולות להיות קרח, מים או גז?</p>
+            
+            <div class="states-controls">
+              <button class="state-btn" data-state="solid">🧊 קרח</button>
+              <button class="state-btn" data-state="liquid">💧 מים</button>
+              <button class="state-btn" data-state="gas">☁️ גז</button>
+            </div>
+            
+            <div class="states-demo">
+              <canvas id="states-canvas" width="500" height="350"></canvas>
+            </div>
+            
+            <div class="state-explanation">
+              <p id="state-info">לחצו על הכפתורים למעלה לראות איך משתנים מצבי החומר!</p>
+            </div>
+          </div>
+        </section>
+      </main>
+      
+      <!-- מודל לטיפים -->
+      <div id="tipModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>💡 טיפ מועיל</h3>
+            <button class="close-btn" onclick="closeTipModal()">&times;</button>
+          </div>
+          <div class="tip-content">
+            <p id="tipText"></p>
+            <button onclick="closeTipModal()">הבנתי!</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- מודל לסטטיסטיקות -->
+      <div id="statsModal" class="modal-overlay stats-modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>📊 הנתונים שלי</h2>
+            <button class="close-btn" onclick="closeStatsModal()">&times;</button>
+          </div>
+          
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number" id="timeSpent">0</div>
+              <div class="stat-label">דקות בחקירה</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="pagesVisited">0</div>
+              <div class="stat-label">דפים שחקרתי</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="clicksCount">0</div>
+              <div class="stat-label">לחיצות</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="achievementsCount">0</div>
+              <div class="stat-label">הישגים</div>
+            </div>
+          </div>
+
+          <div class="fun-rating">
+            <h3>🌟 דירוג הכיף שלי</h3>
+            <p id="funRating">חוקר מתחיל - המשך לחקור לעוד הישגים!</p>
+          </div>
+
+          <div class="next-challenge">
+            <h4>🎯 האתגר הבא</h4>
+            <p id="nextChallenge">נסה לחקור את כל הדפים ולגלות את סודות הדבקסם!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
