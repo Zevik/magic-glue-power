@@ -543,15 +543,18 @@ class PageManager {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       if (temperature < 0) {
-        // מוצק - רק רעידות קטנות
+        // מוצק - רעידות שתלויות בטמפרטורה
+        // ככל שקר יותר, פחות רעידות
+        const vibrationIntensity = Math.max(0.1, (temperature + 100) / 100 * 3); // 0.1 ב-100- עד 3 ב-0
+        
         spheres.forEach((sphere, index) => {
           const originalX = sphere.originalX || sphere.x;
           const originalY = sphere.originalY || sphere.y;
           sphere.originalX = originalX;
           sphere.originalY = originalY;
           
-          sphere.x = originalX + (Math.random() - 0.5) * 2;
-          sphere.y = originalY + (Math.random() - 0.5) * 2;
+          sphere.x = originalX + (Math.random() - 0.5) * vibrationIntensity;
+          sphere.y = originalY + (Math.random() - 0.5) * vibrationIntensity;
           sphere.draw(ctx);
         });
       } else if (temperature >= 0 && temperature <= 100) {
@@ -612,7 +615,11 @@ class PageManager {
       
       let stateText = '';
       if (temperature < 0) {
-        stateText = 'מוצק - הגולות קפואות במקום 🧊';
+        if (temperature < -50) {
+          stateText = 'מוצק קפוא מאוד - הגולות כמעט לא זזות! ❄️';
+        } else {
+          stateText = 'מוצק - הגולות רועדות קצת במקום 🧊';
+        }
       } else if (temperature <= 100) {
         stateText = 'נוזל - הגולות מתגלגלות יחד 💧';
       } else {
@@ -722,7 +729,7 @@ class PageManager {
       
       spheres.forEach((sphere, i) => {
         if (currentState === 'solid') {
-          // מוצק - רק רעידות קטנות
+          // מוצק - רעידות קטנות וקבועות
           const originalX = sphere.originalX || sphere.x;
           const originalY = sphere.originalY || sphere.y;
           sphere.originalX = originalX;
